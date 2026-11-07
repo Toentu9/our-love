@@ -21,7 +21,7 @@
       <a class="brand" href="#welcome" aria-label="Về trang đầu" id="brandHome"><span class="brand-heart">♥</span> OUR LITTLE UNIVERSE</a>
       <div class="topbar-right">
         <div class="progress-dots" aria-label="Tiến trình câu chuyện">
-          <span class="progress-dot active"></span><span class="progress-dot"></span><span class="progress-dot"></span><span class="progress-dot"></span>
+          <span class="progress-dot active"></span><span class="progress-dot"></span><span class="progress-dot"></span><span class="progress-dot"></span><span class="progress-dot"></span>
         </div>
       </div>
     </header>
@@ -52,7 +52,27 @@
         <span class="heart-entry-sparkle sparkle-a">✦</span>
         <span class="heart-entry-sparkle sparkle-b">♡</span>
       </button>
-      <p class="tap-hint"><span>♡</span> Chạm vào trái tim để bắt đầu <span>♡</span></p>
+    </section>
+
+    <!-- SCREEN 2: TIME TOGETHER -->
+    <section class="screen timer-screen" id="togetherTime" aria-labelledby="timerTitle" aria-hidden="true">
+      <div class="timer-decoration timer-decoration-one" aria-hidden="true">♡</div>
+      <div class="timer-decoration timer-decoration-two" aria-hidden="true">♥</div>
+      <div class="timer-content">
+        <p class="timer-kicker">OUR TIME, OUR STORY</p>
+        <h2 id="timerTitle">Thời gian mình <em>bên nhau</em></h2>
+        <p class="timer-date">Từ ngày 19 · 11 · 2025</p>
+        <div class="timer-grid" aria-live="off">
+          <div class="timer-unit"><strong id="daysCount">0</strong><span>days</span></div>
+          <div class="timer-unit"><strong id="hoursCount">0</strong><span>hours</span></div>
+          <div class="timer-unit"><strong id="minutesCount">0</strong><span>minutes</span></div>
+          <div class="timer-unit"><strong id="secondsCount">0</strong><span>seconds</span></div>
+        </div>
+        <p class="timer-note">Từng giây phút đều là một điều đáng yêu ♡</p>
+      </div>
+      <div class="section-bottom timer-bottom">
+        <button class="heart-next" type="button" data-next="treeStory" aria-label="Tiếp tục câu chuyện"><span>♥</span></button>
+      </div>
     </section>
 
     <!-- SCREEN 2: THE HEART TREE -->
@@ -102,7 +122,7 @@
         </article>
       </div>
       <div class="section-bottom">
-        <button class="heart-next" type="button" data-next="memories" aria-label="Chuyển đến trang kỷ niệm"><span>♥</span><small>CONTINUE</small></button>
+        <button class="heart-next" type="button" data-next="memories" aria-label="Chuyển đến trang kỷ niệm"><span>♥</span></button>
       </div>
     </section>
 
@@ -113,16 +133,16 @@
       </div>
       <div class="memories-layout">
         <article class="love-letter">
-          <div class="letter-topline"><span>TO MY FAVORITE PERSON</span><span>♡</span></div>
+          <div class="letter-topline"><span>To my babi</span><span>♡</span></div>
           <div class="letter-content">
             <p class="letter-greeting">Gửi em,</p>
             <p>Cảm ơn em vì đã xuất hiện và cùng anh viết nên một năm thật đặc biệt. Từ những khoảnh khắc bình thường nhất đến những ngày đáng nhớ, mọi thứ đều trở nên vui hơn khi có em ở bên.</p>
             <p>Anh không biết trước tương lai sẽ có những điều gì, nhưng anh mong chúng mình vẫn sẽ luôn biết lắng nghe, quan tâm và cùng nhau tạo thêm thật nhiều kỷ niệm đẹp.</p>
             <p>Cảm ơn em vì đã là một phần dịu dàng trong thế giới của anh.</p>
-            <p class="letter-sign">Thương em, <span>♡</span><br /><strong>Anh</strong></p>
+            <p class="letter-sign">Thương em, <span>♡</span><br /><strong>Chông vợ hài</strong></p>
           </div>
           <div class="letter-stamp">WITH<br />LOVE</div>
-          <div class="letter-footer">ONE YEAR DOWN, A LIFETIME TO GO</div>
+          
         </article>
 
         <div class="memory-gallery">
@@ -139,7 +159,7 @@
         </div>
       </div>
       <div class="section-bottom memories-bottom">
-        <button class="heart-next" type="button" data-next="forever" aria-label="Đến trang cuối"><span>♥</span><small>ONE MORE</small></button>
+        <button class="heart-next" type="button" data-next="forever" aria-label="Đến trang cuối"><span>♥</span></button>
       </div>
     </section>
 
@@ -149,8 +169,8 @@
       <div class="forever-orbit orbit-two"></div>
       <div class="forever-center-heart">♥</div>
       <h2 id="foreverTitle">continue <em>forever</em> love</h2>
-      <p class="forever-subtitle">Một năm là khởi đầu. Mong rằng chúng mình sẽ còn viết tiếp thật nhiều chương mới.</p>
-      <div class="forever-signature">YOU + ME <span>♡</span> ALWAYS</div>
+      <p class="forever-subtitle">Tụi mình sẽ cùng nắm tay bước tiếp chung một đường</p>
+      <div class="forever-signature">ANH + EM = Tình Yêu toa bự.</div>
       <button class="replay-button" id="replayStory" type="button">↺ &nbsp; OUR STORY, AGAIN</button>
     </section>
 
@@ -165,84 +185,5 @@
   </div>
 
   <script src="script.js"></script>
-
-  <script>
-    // Tán cây trái tim dày hơn, màu hồng trầm hơn.
-    window.makeHeartLeaves = function () {
-      const container = document.getElementById('heartLeaves');
-      const stage = document.getElementById('treeStage');
-      if (!container || !stage) return;
-
-      container.replaceChildren();
-      const width = stage.clientWidth || 460;
-      const height = stage.clientHeight || 485;
-      const scale = Math.min(width / 500, height / 560);
-      const centerX = width / 2;
-      const centerY = 220 * scale;
-      const heartScale = 9 * scale;
-      const points = [];
-
-      function heartPoint(t, factor = 1) {
-        const x = 16 * Math.pow(Math.sin(t), 3);
-        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t)
-          - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-        return {
-          x: centerX + x * heartScale * factor,
-          y: centerY - y * heartScale * factor
-        };
-      }
-
-      // Nhiều vòng lá hơn để tán cây kín và rõ hình trái tim.
-      [1, 0.88, 0.76, 0.64, 0.52].forEach((factor, ring) => {
-        const counts = [52, 46, 40, 34, 27];
-        const count = counts[ring];
-        for (let i = 0; i < count; i++) {
-          const t = Math.PI * 2 * i / count + (ring % 2 ? 0.045 : 0);
-          points.push({
-            ...heartPoint(t, factor),
-            size: ring < 2 ? 15 : 13
-          });
-        }
-      });
-
-      // Lá bên trong lấp khoảng trống nhưng vẫn giữ dáng trái tim.
-      const innerRows = [
-        { y: -0.22, span: 0.22, count: 5 },
-        { y: -0.08, span: 0.32, count: 7 },
-        { y: 0.08, span: 0.35, count: 8 },
-        { y: 0.23, span: 0.27, count: 6 },
-        { y: 0.36, span: 0.15, count: 4 }
-      ];
-      innerRows.forEach(row => {
-        for (let i = 0; i < row.count; i++) {
-          const x = row.count === 1 ? 0 : -row.span + (2 * row.span * i / (row.count - 1));
-          points.push({
-            x: centerX + x * width * 0.38,
-            y: centerY + row.y * height * 0.29,
-            size: 13
-          });
-        }
-      });
-
-      const colors = [
-        '#c85f7d', '#d46b88', '#bd5574',
-        '#dc7893', '#c45b79', '#d16b87',
-        '#b94f70', '#e0839b'
-      ];
-
-      points.forEach((point, i) => {
-        const leaf = document.createElement('span');
-        leaf.className = 'leaf-heart';
-        leaf.textContent = '♥';
-        leaf.style.left = `${point.x}px`;
-        leaf.style.top = `${point.y}px`;
-        leaf.style.fontSize = `${point.size * scale + 2}px`;
-        leaf.style.setProperty('--leaf-color', colors[i % colors.length]);
-        leaf.style.setProperty('--delay', `${0.35 + i * 0.012}s`);
-        leaf.style.setProperty('--rot', `${(i * 31) % 54 - 27}deg`);
-        container.appendChild(leaf);
-      });
-    };
-  </script>
   </body>
 </html>
