@@ -1,96 +1,159 @@
-// Album photos are loaded locally.
-const memoryPhotos = [
-  'memory-01.jpg', 'memory-02.jpg',
-  'memory-03.jpg', 'memory-04.jpg',
-  'memory-05.jpg', 'memory-06.jpg',
-  'memory-07.jpg', 'memory-08.jpg',
-  'memory-09.jpg', 'memory-10.jpg',
-  'memory-11.jpg', 'memory-12.jpg',
-  'memory-13.jpg', 'memory-14.jpg',
-  'memory-15.jpg', 'memory-16.jpg',
-  'memory-17.jpg', 'memory-18.jpg',
-  'memory-19.jpg'
-];
 
-const screens = [...document.querySelectorAll('.screen')];
-const dots = [...document.querySelectorAll('.progress-dot')];
+// 19 ảnh kỷ niệm nằm cùng thư mục với index.html
+const memoryPhotos = Array.from(
+  { length: 19 },
+  (_, i) => `memory-${String(i + 1).padStart(2, "0")}.jpg`
+);
 
-let activeScreen = 0;
+// ==============================
+// CHUYỂN TRANG
+// ==============================
 
-function getElement(id) {
-  return document.getElementById(id);
-}
+const screens = [...document.querySelectorAll(".screen")];
+const dots = [...document.querySelectorAll(".progress-dot")];
 
-// Chuyển màn hình
 function goToScreen(id) {
   const nextIndex = screens.findIndex(screen => screen.id === id);
 
   if (nextIndex < 0) return;
 
-  activeScreen = nextIndex;
-
   screens.forEach((screen, index) => {
-    const isActive = index === nextIndex;
-    screen.classList.toggle('active', isActive);
-    screen.setAttribute('aria-hidden', String(!isActive));
+    const active = index === nextIndex;
+
+    screen.classList.toggle("active", active);
+    screen.setAttribute("aria-hidden", String(!active));
   });
 
   dots.forEach((dot, index) => {
-    dot.classList.toggle('active', index === nextIndex);
+    dot.classList.toggle("active", index === nextIndex);
   });
 
-  if (id === 'treeStory') {
-    window.setTimeout(() => {
+  if (id === "treeStory") {
+    const stage = document.getElementById("treeStage");
+
+    stage?.classList.remove("grown");
+
+    requestAnimationFrame(() => {
       makeHeartLeaves();
 
-      const treeStage = getElement('treeStage');
-      if (treeStage) treeStage.classList.add('grown');
-    }, 120);
+      requestAnimationFrame(() => {
+        stage?.classList.add("grown");
+      });
+    });
   }
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === "memories") {
+    updateCarousel();
+  }
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
-// Các nút chuyển màn hình
-getElement('startStory')?.addEventListener('click', () => {
-  goToScreen('treeStory');
+// Nút trái tim trang đầu -> trang đếm thời gian
+document.getElementById("startStory")?.addEventListener("click", () => {
+  goToScreen("togetherTime");
 });
 
-document.querySelectorAll('[data-next]').forEach(button => {
-  button.addEventListener('click', () => {
+// Các nút trái tim chuyển trang
+document.querySelectorAll("[data-next]").forEach(button => {
+  button.addEventListener("click", () => {
     goToScreen(button.dataset.next);
   });
 });
 
-getElement('brandHome')?.addEventListener('click', event => {
+// Logo trở về trang đầu
+document.getElementById("brandHome")?.addEventListener("click", event => {
   event.preventDefault();
-  goToScreen('welcome');
+
+  document.getElementById("treeStage")?.classList.remove("grown");
+
+  goToScreen("welcome");
 });
 
-getElement('replayStory')?.addEventListener('click', () => {
-  getElement('treeStage')?.classList.remove('grown');
-  goToScreen('welcome');
+// Nút xem lại câu chuyện
+document.getElementById("replayStory")?.addEventListener("click", () => {
+  document.getElementById("treeStage")?.classList.remove("grown");
+
+  goToScreen("welcome");
 });
 
-// Tạo tán cây hình trái tim
+// ==============================
+// BỘ ĐẾM THỜI GIAN BÊN NHAU
+// ==============================
+
+// Ngày bắt đầu: 19/11/2025 lúc 00:00
+const relationshipStart = new Date(2025, 10, 19, 0, 0, 0);
+
+function updateTogetherTimer() {
+  const now = new Date();
+
+  let elapsed = Math.max(
+    0,
+    now.getTime() - relationshipStart.getTime()
+  );
+
+  const DAY = 24 * 60 * 60 * 1000;
+  const HOUR = 60 * 60 * 1000;
+  const MINUTE = 60 * 1000;
+
+  const days = Math.floor(elapsed / DAY);
+  elapsed %= DAY;
+
+  const hours = Math.floor(elapsed / HOUR);
+  elapsed %= HOUR;
+
+  const minutes = Math.floor(elapsed / MINUTE);
+
+  const seconds = Math.floor(
+    (now.getTime() - relationshipStart.getTime()) / 1000
+  ) % 60;
+
+  const values = {
+    daysCount: days,
+    hoursCount: hours,
+    minutesCount: minutes,
+    secondsCount: seconds
+  };
+
+  for (const [id, value] of Object.entries(values)) {
+    const element = document.getElementById(id);
+
+    if (element) {
+      element.textContent = String(value).padStart(2, "0");
+    }
+  }
+}
+
+updateTogetherTimer();
+window.setInterval(updateTogetherTimer, 1000);
+
+// ==============================
+// CÂY TRÁI TIM
+// ==============================
+
 function makeHeartLeaves() {
-  const container = getElement('heartLeaves');
-  const stage = getElement('treeStage');
+  const container = document.getElementById("heartLeaves");
+  const stage = document.getElementById("treeStage");
 
   if (!container || !stage) return;
 
   container.replaceChildren();
 
-  const width = stage.clientWidth || 460;
-  const height = stage.clientHeight || 485;
+  const width = stage.clientWidth || 560;
+  const height = stage.clientHeight || 580;
+
   const scale = Math.min(width / 500, height / 560);
 
   const centerX = width / 2;
-  const centerY = 220 * scale;
-  const heartScale = 9 * scale;
+  const centerY = 215 * scale;
+  const heartScale = 10.8 * scale;
 
   const points = [];
 
+  // Công thức tạo hình trái tim
   function heartPoint(t, factor = 1) {
     const x = 16 * Math.pow(Math.sin(t), 3);
 
@@ -106,107 +169,168 @@ function makeHeartLeaves() {
     };
   }
 
-  [1, 0.78, 0.55].forEach((factor, ring) => {
-    const count = ring === 0 ? 38 : ring === 1 ? 25 : 16;
+  // Nhiều lớp lá bao quanh để tán cây đầy hơn
+  const rings = [
+    { factor: 1, count: 68, size: 15 },
+    { factor: 0.91, count: 62, size: 15 },
+    { factor: 0.81, count: 56, size: 14 },
+    { factor: 0.70, count: 49, size: 14 },
+    { factor: 0.58, count: 42, size: 13 },
+    { factor: 0.45, count: 32, size: 13 }
+  ];
 
-    for (let i = 0; i < count; i++) {
+  rings.forEach((ring, ringIndex) => {
+    for (let i = 0; i < ring.count; i++) {
       const t =
-        (Math.PI * 2 * i / count)
-        + (ring % 2 ? 0.07 : 0);
+        (Math.PI * 2 * i / ring.count)
+        + (ringIndex % 2 ? 0.025 : 0);
 
       points.push({
-        ...heartPoint(t, factor),
-        size: ring === 0 ? 17 : ring === 1 ? 15 : 13
+        ...heartPoint(t, ring.factor),
+        size: ring.size + Math.random() * 2
       });
     }
   });
 
-  const inner = [
-    [-0.28, -0.12], [-0.12, -0.24],
-    [0.10, -0.25], [0.29, -0.12],
-    [-0.34, 0.08], [-0.18, 0.12],
-    [0, 0.02], [0.18, 0.12],
-    [0.34, 0.08], [-0.16, 0.28],
-    [0.15, 0.28], [0, 0.38]
-  ];
+  // Lấp phần giữa tán cây
+  for (let row = 0; row < 13; row++) {
+    const yNorm = -0.72 + row * 0.115;
 
-  inner.forEach(([x, y]) => {
-    points.push({
-      x: centerX + x * width * 0.38,
-      y: centerY + y * height * 0.29,
-      size: 14
-    });
-  });
+    const half = Math.sqrt(
+      Math.max(0.04, 1 - yNorm * yNorm)
+    );
 
+    const count = Math.round(7 + half * 13);
+
+    for (let col = 0; col < count; col++) {
+      const xNorm = count === 1
+        ? 0
+        : -half + (2 * half * col / (count - 1));
+
+      const jitterX = (Math.random() - 0.5) * 12 * scale;
+      const jitterY = (Math.random() - 0.5) * 12 * scale;
+
+      points.push({
+        x: centerX + xNorm * 150 * scale + jitterX,
+        y: centerY + yNorm * 104 * scale + jitterY,
+        size: 11 + Math.random() * 5
+      });
+    }
+  }
+
+  // Màu lá trái tim đậm hơn
   const colors = [
-    '#e98da5', '#f2a3b5', '#dc7894',
-    '#f5b4c2', '#d96f8e', '#ed9aab'
+    "#b93662",
+    "#c6426d",
+    "#d34b78",
+    "#bd315f",
+    "#d85a82",
+    "#c94a73",
+    "#e16a8e",
+    "#b82f5c"
   ];
 
-  points.forEach((point, i) => {
-    const leaf = document.createElement('span');
+  points.forEach((point, index) => {
+    const leaf = document.createElement("span");
 
-    leaf.className = 'leaf-heart';
-    leaf.textContent = '♥';
+    leaf.className = "leaf-heart";
+    leaf.textContent = "♥";
 
     leaf.style.left = `${point.x}px`;
     leaf.style.top = `${point.y}px`;
-    leaf.style.fontSize = `${point.size * scale + 2}px`;
+
+    leaf.style.fontSize =
+      `${point.size * scale + 2}px`;
 
     leaf.style.setProperty(
-      '--leaf-color',
-      colors[i % colors.length]
+      "--leaf-color",
+      colors[index % colors.length]
     );
 
     leaf.style.setProperty(
-      '--delay',
-      `${0.55 + i * 0.038}s`
+      "--delay",
+      `${0.25 + index * 0.004}s`
     );
 
     leaf.style.setProperty(
-      '--rot',
-      `${(i * 31) % 54 - 27}deg`
+      "--rot",
+      `${(index * 29) % 48 - 24}deg`
     );
 
     container.appendChild(leaf);
   });
 }
 
-// Trái tim bay trong nền
-const floatingHearts = getElement('floatingHearts');
+// ==============================
+// TRÁI TIM RƠI XUỐNG
+// ==============================
+
+const floatingHearts = document.getElementById("floatingHearts");
 
 function addFloatingHeart() {
-  if (!floatingHearts) return;
+  if (!floatingHearts || document.hidden) return;
 
-  const heart = document.createElement('span');
+  const heart = document.createElement("span");
 
-  heart.className = 'float-heart';
-  heart.textContent = Math.random() > 0.45 ? '♡' : '♥';
+  heart.className = "float-heart";
+
+  heart.textContent = Math.random() > 0.38
+    ? "♡"
+    : "♥";
 
   heart.style.left = `${Math.random() * 100}%`;
-  heart.style.fontSize = `${10 + Math.random() * 13}px`;
-  heart.style.animationDuration = `${9 + Math.random() * 8}s`;
-  heart.style.opacity = `${0.2 + Math.random() * 0.35}`;
+
+  heart.style.fontSize =
+    `${12 + Math.random() * 19}px`;
+
+  heart.style.animationDuration =
+    `${8 + Math.random() * 8}s`;
+
+  const drift = (Math.random() - 0.5) * 150;
+
+  heart.style.setProperty(
+    "--drift",
+    `${drift}px`
+  );
+
+  const opacity = 0.12 + Math.random() * 0.22;
+
+  heart.style.setProperty(
+    "--heart-opacity",
+    opacity
+  );
 
   floatingHearts.appendChild(heart);
 
-  window.setTimeout(() => heart.remove(), 18000);
+  window.setTimeout(() => {
+    heart.remove();
+  }, 17000);
 }
 
-for (let i = 0; i < 8; i++) {
-  window.setTimeout(addFloatingHeart, i * 650);
+// Tạo nhiều trái tim ngay khi mở trang
+for (let i = 0; i < 28; i++) {
+  window.setTimeout(addFloatingHeart, i * 180);
 }
 
-window.setInterval(addFloatingHeart, 1700);
+// Tiếp tục tạo trái tim liên tục
+window.setInterval(addFloatingHeart, 360);
 
-// Carousel ảnh kỷ niệm 3D
-const track = getElement('carouselTrack');
-const galleryCount = getElement('galleryCount');
-const galleryCaption = getElement('galleryCaption');
+// ==============================
+// ALBUM ẢNH 3D
+// ==============================
+
+const track = document.getElementById("carouselTrack");
+const galleryCount = document.getElementById("galleryCount");
+const galleryCaption = document.getElementById("galleryCaption");
+
+const lightbox = document.getElementById("lightbox");
+const lightboxImage = document.getElementById("lightboxImage");
+const lightboxCaption = document.getElementById("lightboxCaption");
 
 let currentPhoto = 0;
 let cards = [];
 
+// Tính khoảng cách giữa ảnh và ảnh chính
 function wrappedOffset(index, center, total) {
   let diff = index - center;
 
@@ -216,96 +340,17 @@ function wrappedOffset(index, center, total) {
   return diff;
 }
 
-// Hộp ảnh phóng to
-const lightbox = getElement('lightbox');
-const lightboxImage = getElement('lightboxImage');
-const lightboxCaption = getElement('lightboxCaption');
-
-function openLightbox(index) {
-  if (!lightbox || !lightboxImage || !lightboxCaption) return;
-
-  currentPhoto = index;
-  updateCarousel();
-
-  lightboxImage.src = memoryPhotos[index];
-
-  lightboxCaption.textContent =
-    `A little moment, just us · ${String(index + 1).padStart(2, '0')}`;
-
-  lightbox.classList.add('open');
-  lightbox.setAttribute('aria-hidden', 'false');
-}
-
-function closeLightbox() {
-  if (!lightbox) return;
-
-  lightbox.classList.remove('open');
-  lightbox.setAttribute('aria-hidden', 'true');
-}
-
-function stepLightbox(step) {
-  if (!lightboxImage || !lightboxCaption) return;
-
-  nextPhoto(step);
-
-  lightboxImage.src = memoryPhotos[currentPhoto];
-
-  lightboxCaption.textContent =
-    `A little moment, just us · ${String(currentPhoto + 1).padStart(2, '0')}`;
-}
-
-// Tạo các thẻ ảnh
-if (track) {
-  cards = memoryPhotos.map((src, index) => {
-    const card = document.createElement('button');
-
-    card.type = 'button';
-    card.className = 'memory-card';
-
-    card.setAttribute(
-      'aria-label',
-      `Mở ảnh kỷ niệm ${index + 1}`
-    );
-
-    const image = document.createElement('img');
-
-    image.src = src;
-    image.alt = `Ảnh kỷ niệm ${index + 1}`;
-    image.loading = index < 5 ? 'eager' : 'lazy';
-
-    image.addEventListener('error', () => {
-      console.warn(`Không tìm thấy ảnh: ${src}`);
-    });
-
-    card.appendChild(image);
-
-    card.addEventListener('click', () => {
-      const offset = wrappedOffset(
-        index,
-        currentPhoto,
-        memoryPhotos.length
-      );
-
-      if (Math.abs(offset) <= 2 && offset !== 0) {
-        currentPhoto = index;
-        updateCarousel();
-      } else if (offset === 0) {
-        openLightbox(index);
-      }
-    });
-
-    track.appendChild(card);
-
-    return card;
-  });
-}
-
-// Cập nhật vị trí carousel
+// Cập nhật vị trí album
 function updateCarousel() {
-  if (!cards.length) return;
+  if (
+    !track ||
+    !galleryCount ||
+    !galleryCaption ||
+    !cards.length
+  ) return;
 
   const isMobile = window.matchMedia(
-    '(max-width: 680px)'
+    "(max-width: 680px)"
   ).matches;
 
   const spacing = isMobile
@@ -323,52 +368,49 @@ function updateCarousel() {
 
     const distance = Math.abs(offset);
 
-    if (distance > 2) {
-      card.style.opacity = '0';
-      card.style.pointerEvents = 'none';
-      card.style.zIndex = '0';
+    const scale = distance === 0
+      ? 1
+      : distance === 1
+        ? 0.87
+        : 0.72;
 
-      card.style.transform =
-        `translate(-50%,-50%) translateX(${offset * spacing}px) rotateY(${-offset * 27}deg) scale(.65)`;
+    const opacity = distance === 0
+      ? 1
+      : distance === 1
+        ? 0.76
+        : 0.42;
 
-      card.classList.remove('center-card');
-      return;
-    }
+    card.style.opacity = distance > 2
+      ? "0"
+      : String(opacity);
 
-    const scales = {
-      0: 1,
-      1: 0.87,
-      2: 0.72
-    };
+    card.style.pointerEvents = distance > 2
+      ? "none"
+      : "auto";
 
-    const opacities = {
-      0: 1,
-      1: 0.76,
-      2: 0.42
-    };
-
-    card.style.opacity = String(opacities[distance]);
-    card.style.pointerEvents = 'auto';
     card.style.zIndex = String(10 - distance);
 
     card.style.transform =
-      `translate(-50%,-50%) translateX(${offset * spacing}px) rotateY(${-offset * 27}deg) scale(${scales[distance]})`;
+      `translate(-50%, -50%) ` +
+      `translateX(${offset * spacing}px) ` +
+      `rotateY(${-offset * 27}deg) ` +
+      `scale(${distance > 2 ? 0.65 : scale})`;
 
-    card.classList.toggle('center-card', offset === 0);
+    card.classList.toggle(
+      "center-card",
+      offset === 0
+    );
   });
 
-  if (galleryCount) {
-    galleryCount.textContent =
-      `${String(currentPhoto + 1).padStart(2, '0')} / ${String(memoryPhotos.length).padStart(2, '0')}`;
-  }
+  galleryCount.textContent =
+    `${String(currentPhoto + 1).padStart(2, "0")} / ` +
+    `${String(memoryPhotos.length).padStart(2, "0")}`;
 
-  if (galleryCaption) {
-    galleryCaption.textContent =
-      `Our little memory · ${String(currentPhoto + 1).padStart(2, '0')}`;
-  }
+  galleryCaption.textContent =
+    `Our little memory · ${String(currentPhoto + 1).padStart(2, "0")}`;
 }
 
-// Chuyển ảnh trước / sau
+// Chuyển ảnh
 function nextPhoto(step = 1) {
   currentPhoto =
     (currentPhoto + step + memoryPhotos.length)
@@ -377,65 +419,168 @@ function nextPhoto(step = 1) {
   updateCarousel();
 }
 
-getElement('galleryPrev')?.addEventListener('click', () => {
-  nextPhoto(-1);
-});
+// Mở ảnh lớn
+function openLightbox(index) {
+  currentPhoto = index;
 
-getElement('galleryNext')?.addEventListener('click', () => {
-  nextPhoto(1);
-});
+  updateCarousel();
 
-// Tự động xoay ảnh
-window.addEventListener('resize', updateCarousel);
-
-updateCarousel();
-
-window.setInterval(() => {
-  const galleryScreen = screens[2];
-
-  if (
-    galleryScreen &&
-    galleryScreen.classList.contains('active') &&
-    lightbox &&
-    !lightbox.classList.contains('open')
-  ) {
-    nextPhoto(1);
+  if (lightboxImage) {
+    lightboxImage.src = memoryPhotos[index];
   }
-}, 3800);
 
-// Các nút trong lightbox
-getElement('lightboxClose')?.addEventListener(
-  'click',
+  if (lightboxCaption) {
+    lightboxCaption.textContent =
+      `A little moment, just us · ${String(index + 1).padStart(2, "0")}`;
+  }
+
+  lightbox?.classList.add("open");
+  lightbox?.setAttribute("aria-hidden", "false");
+}
+
+// Đóng ảnh lớn
+function closeLightbox() {
+  lightbox?.classList.remove("open");
+  lightbox?.setAttribute("aria-hidden", "true");
+}
+
+// Chuyển ảnh trong lightbox
+function stepLightbox(step) {
+  nextPhoto(step);
+
+  if (lightboxImage) {
+    lightboxImage.src = memoryPhotos[currentPhoto];
+  }
+
+  if (lightboxCaption) {
+    lightboxCaption.textContent =
+      `A little moment, just us · ${String(currentPhoto + 1).padStart(2, "0")}`;
+  }
+}
+
+// Tạo 19 thẻ ảnh
+cards = memoryPhotos.map((src, index) => {
+  const card = document.createElement("button");
+
+  card.type = "button";
+  card.className = "memory-card";
+
+  card.setAttribute(
+    "aria-label",
+    `Mở ảnh kỷ niệm ${index + 1}`
+  );
+
+  const image = document.createElement("img");
+
+  image.src = src;
+  image.alt = `Ảnh kỷ niệm ${index + 1}`;
+  image.loading = index < 5 ? "eager" : "lazy";
+
+  image.addEventListener("error", () => {
+    console.warn(
+      `Không tìm thấy ảnh: ${src}. Hãy kiểm tra tên file.`
+    );
+
+    card.classList.add("image-missing");
+  });
+
+  card.appendChild(image);
+
+  card.addEventListener("click", () => {
+    const offset = wrappedOffset(
+      index,
+      currentPhoto,
+      memoryPhotos.length
+    );
+
+    if (Math.abs(offset) <= 2 && offset !== 0) {
+      currentPhoto = index;
+      updateCarousel();
+    } else if (offset === 0) {
+      openLightbox(index);
+    }
+  });
+
+  track?.appendChild(card);
+
+  return card;
+});
+
+// Các nút album
+document.getElementById("galleryPrev")?.addEventListener(
+  "click",
+  () => nextPhoto(-1)
+);
+
+document.getElementById("galleryNext")?.addEventListener(
+  "click",
+  () => nextPhoto(1)
+);
+
+// Các nút lightbox
+document.getElementById("lightboxClose")?.addEventListener(
+  "click",
   closeLightbox
 );
 
-getElement('lightboxPrev')?.addEventListener('click', () => {
-  stepLightbox(-1);
-});
+document.getElementById("lightboxPrev")?.addEventListener(
+  "click",
+  () => stepLightbox(-1)
+);
 
-getElement('lightboxNext')?.addEventListener('click', () => {
-  stepLightbox(1);
-});
+document.getElementById("lightboxNext")?.addEventListener(
+  "click",
+  () => stepLightbox(1)
+);
 
-lightbox?.addEventListener('click', event => {
+// Bấm ra ngoài ảnh để đóng
+lightbox?.addEventListener("click", event => {
   if (event.target === lightbox) {
     closeLightbox();
   }
 });
 
 // Điều khiển bằng bàn phím
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') {
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
     closeLightbox();
   }
 
-  if (lightbox?.classList.contains('open')) {
-    if (event.key === 'ArrowRight') {
-      stepLightbox(1);
-    }
+  if (
+    lightbox?.classList.contains("open") &&
+    event.key === "ArrowRight"
+  ) {
+    stepLightbox(1);
+  }
 
-    if (event.key === 'ArrowLeft') {
-      stepLightbox(-1);
-    }
+  if (
+    lightbox?.classList.contains("open") &&
+    event.key === "ArrowLeft"
+  ) {
+    stepLightbox(-1);
   }
 });
+
+// Khi thay đổi kích thước màn hình
+window.addEventListener("resize", () => {
+  updateCarousel();
+
+  if (
+    document.getElementById("treeStory")?.classList.contains("active")
+  ) {
+    makeHeartLeaves();
+  }
+});
+
+// Khởi tạo album
+updateCarousel();
+
+// Tự động xoay album mỗi 3.8 giây
+window.setInterval(() => {
+  if (
+    document.getElementById("memories")?.classList.contains("active") &&
+    !lightbox?.classList.contains("open")
+  ) {
+    nextPhoto(1);
+  }
+}, 3800);
